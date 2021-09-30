@@ -1,0 +1,7 @@
+2021/06/14 19:41:10 [emerg] 1#1: host not found in upstream "php:9001" in /etc/nginx/conf.d/php-upstream.conf:2
+2021/06/14 19:50:22 [emerg] 1#1: host not found in upstream "php:9001" in /etc/nginx/conf.d/php-upstream.conf:2
+2021/06/14 19:59:33 [emerg] 1#1: host not found in upstream "php:9001" in /etc/nginx/conf.d/php-upstream.conf:2
+2021/06/14 20:01:22 [emerg] 1#1: host not found in upstream "php:9001" in /etc/nginx/conf.d/php-upstream.conf:2
+2021/09/29 08:10:55 [emerg] 1#1: host not found in upstream "php:9001" in /etc/nginx/conf.d/php-upstream.conf:2
+2021/09/29 08:16:14 [emerg] 1#1: host not found in upstream "php:9001" in /etc/nginx/conf.d/php-upstream.conf:2
+2021/09/29 08:23:05 [emerg] 1#1: host not found in upstream "php:9001" in /etc/nginx/conf.d/php-upstream.conf:2
