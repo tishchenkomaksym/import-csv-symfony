@@ -20,14 +20,17 @@ services:
             context: ./docker/php-fpm
         ports:
             - "${PHP_PORT}:9000"
+        environment:
+            PHP_IDE_CONFIG: "serverName=csv-symfony"
         volumes:
             - .:/var/www/html
-#            - -./docker/php-fpm/php.ini-development:/usr/local/etc/php/php.ini-development
             - ./logs/symfony:/var/www/symfony/var/log:cached
+
         depends_on:
             - db-symfony-csv
         expose:
             - 9003
+
 
 
     nginx-symfony-csv:
