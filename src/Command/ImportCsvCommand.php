@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Service\ImportService;
+use League\Csv\Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,8 +13,19 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class ImportCsvCommand extends Command
 {
+    /**
+     * @var string
+     */
     protected static $defaultName = 'import:csv {path}';
+
+    /**
+     * @var string
+     */
     protected static $defaultDescription = 'Import data from csv to db';
+
+    /**
+     * @var ImportService
+     */
     private ImportService $importService;
 
     public function __construct(ImportService $importService)
@@ -23,6 +35,7 @@ class ImportCsvCommand extends Command
         $this->importService = $importService;
     }
 
+
     protected function configure(): void
     {
         $this
@@ -30,6 +43,13 @@ class ImportCsvCommand extends Command
             ->addOption('test', null, InputOption::VALUE_NONE, 'Option description');
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     *
+     * @return int
+     * @throws Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -39,17 +59,8 @@ class ImportCsvCommand extends Command
         $this->importService->importCsv($path);
 
         foreach ($this->importService->error as $error) {
-            $io->note($error);
+            $io->info($error);
         }
-//        if ($arg1) {
-//            $io->note(sprintf('You passed an argument: %s', $arg1));
-//        }
-
-        if ($input->getOption('test')) {
-            // ...
-        }
-
-//        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
 
         return Command::SUCCESS;
     }

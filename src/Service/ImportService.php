@@ -6,6 +6,7 @@ namespace App\Service;
 use App\Entity\Products;
 use App\Repository\ProductsRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use League\Csv\Exception;
 use League\Csv\Reader;
 use League\Csv\Statement;
 use Symfony\Component\Validator\Constraints\Collection;
@@ -18,9 +19,19 @@ use Symfony\Component\Validator\Validation;
 class ImportService
 {
 
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
 
+    /**
+     * @var array
+     */
     public array $error = [];
+
+    /**
+     * @var ProductsRepository
+     */
     private ProductsRepository $repository;
 
     public function __construct(EntityManagerInterface $em, ProductsRepository $repository)
@@ -29,12 +40,16 @@ class ImportService
         $this->repository = $repository;
     }
 
-    public function importCsv($path)
+    /**
+     * @param string $path
+     *
+     * @throws Exception
+     */
+    public function importCsv(string $path)
     {
-        $csv = Reader::createFromPath('stock.csv', 'r');
-        $csv->setHeaderOffset(0); //set the CSV header offset
+        $csv = Reader::createFromPath($path, 'r');
+        $csv->setHeaderOffset(0);
         $csv->getHeader();
-//get 25 records starting from the 11th row
         $stmt = Statement::create();
 
         $records = $stmt->process($csv);
@@ -47,12 +62,13 @@ class ImportService
                 'price' => $record['Cost in GBP'],
                 'discontinued' => $record['Discontinued']
                 ], $key);
-
         }
-
-        echo $path;
     }
 
+    /**
+     * @param $record
+     * @param $key
+     */
     public function saveProduct($record, $key)
     {
         $record = $this->filterRules($record, $key);
@@ -62,16 +78,24 @@ class ImportService
         }
 
         $product = new Products();
+
         $product->setName($record['name'])
                 ->setCode($record['code'])
                 ->setDescription($record['description'])
                 ->setPrice($record['price'])
                 ->setStock($record['stock'])
                 ->setDiscontinuedAt($record['discontinued'] == '' ? null : $record['discontinued']);
+
         $this->entityManager->persist($product);
         $this->entityManager->flush();
     }
 
+    /**
+     * @param $record
+     * @param $key
+     *
+     * @return array|mixed
+     */
     private function filterRules($record, $key)
     {
         foreach ($record as $i => $item) {
@@ -90,6 +114,10 @@ class ImportService
         return $filteredRow ?? [];
     }
 
+    /**
+     * @param $product
+     * @param $key
+     */
     public function validateProduct($product, $key)
     {
         $validator = Validation::createValidator();
@@ -119,6 +147,11 @@ class ImportService
 
     }
 
+    /**
+     * @param $code
+     *
+     * @return Products|null
+     */
     public function checkUnique($code): ?Products
     {
         return $this->repository->findOneBy(['code' => $code]);
